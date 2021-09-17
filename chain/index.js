@@ -69,8 +69,8 @@ async function syncChain(chainType, logger, nodeUrl, sync_interval_block_num) {
 }
 
 async function syncBlocks(chain, fromBlk, toBlk) {
+  let chainType = chain.chainType;
   try {
-    let chainType = chain.chainType;
     let blocks = [];
     for (let blockNumber = fromBlk; blockNumber < toBlk; blockNumber++) {
       blocks.push(blockNumber);
@@ -102,8 +102,8 @@ async function syncBlocks(chain, fromBlk, toBlk) {
 }
 
 async function syncOneBlock(chain, blockNumber) {
+  let chainType = chain.chainType;
   try {
-    let chainType = chain.chainType;
     let block = await chain.getBlockByNumberSync(blockNumber);
     let transactions = await block.transactions;
 
@@ -135,20 +135,22 @@ async function syncOneBlock(chain, blockNumber) {
           // logger.debug("syncOneBlock transaction to done:", chainType, blockNumber, transaction.hash, to);
           await global.modelOps.syncSaveAddress(chainType, to, toContent);
 
-          if (fromIsContract || toIsContract) {
-            let contractTx = {
-              txType: 'contract',
-              blockHash: transaction.blockHash,
-              blockNumber: transaction.blockNumber,
-              transactionIndex: transaction.transactionIndex,
-              input: transaction.input,
-              from: transaction.from,
-              to: transaction.to,
-              value: transaction.value.toString(10)
-            }
-            // logger.debug("syncOneBlock transaction contractTx done:", chainType, blockNumber, transaction.hash);
-            await global.modelOps.syncSaveTx(chainType, transaction.hash, contractTx);
+          let txContent = {
+            blockHash: transaction.blockHash,
+            blockNumber: transaction.blockNumber,
+            transactionIndex: transaction.transactionIndex,
+            input: transaction.input,
+            from: transaction.from,
+            to: transaction.to,
+            value: transaction.value.toString(10)
           }
+          if (fromIsContract || toIsContract) {
+            txContent.txType = 'contract';
+          } else {
+            txContent.txType = 'normal';
+          }
+          await global.modelOps.syncSaveTx(chainType, transaction.hash, txContent);
+
           logger.debug("syncOneBlock transaction done :", chainType, blockNumber, transaction.hash);
           resolve();
         } catch (err) {
