@@ -112,32 +112,28 @@ async function syncOneBlock(chain, blockNumber) {
         try {
           logger.debug("syncOneBlock transaction begin :", chainType, blockNumber, transaction.hash);
           let from = transaction.from;
-          if (from) {
-            let fromIsContract = await chain.isContract(from);
-            let fromBalance = await chain.getBalanceSync(from);
+          let fromIsContract = await chain.isContract(from);
+          let fromBalance = await chain.getBalanceSync(from);
 
-            let fromContent = {
-              balance: fromBalance.toString(10),
-              isContract: fromIsContract,
-              scannedBlockNumber: blockNumber
-            }
-            // logger.debug("syncOneBlock transaction from done:", chainType, blockNumber, transaction.hash, from);
-            await global.modelOps.syncSaveAddress(chainType, from, fromContent);
+          let fromContent = {
+            balance: fromBalance.toString(10),
+            isContract: fromIsContract,
+            scannedBlockNumber: blockNumber
           }
+          // logger.debug("syncOneBlock transaction from done:", chainType, blockNumber, transaction.hash, from);
+          await global.modelOps.syncSaveAddress(chainType, from, fromContent);
 
           let to = transaction.to;
-          if (to) {
-            let toIsContract = await chain.isContract(to);
-            let toBalance = await chain.getBalanceSync(to);
+          let toIsContract = await chain.isContract(to);
+          let toBalance = await chain.getBalanceSync(to);
 
-            let toContent = {
-              balance: toBalance.toString(10),
-              isContract: toIsContract,
-              scannedBlockNumber: blockNumber
-            }
-            // logger.debug("syncOneBlock transaction to done:", chainType, blockNumber, transaction.hash, to);
-            await global.modelOps.syncSaveAddress(chainType, to, toContent);
+          let toContent = {
+            balance: toBalance.toString(10),
+            isContract: toIsContract,
+            scannedBlockNumber: blockNumber
           }
+          // logger.debug("syncOneBlock transaction to done:", chainType, blockNumber, transaction.hash, to);
+          await global.modelOps.syncSaveAddress(chainType, to, toContent);
 
           let txContent = {
             blockHash: transaction.blockHash,
