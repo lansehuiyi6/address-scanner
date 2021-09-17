@@ -25,7 +25,7 @@ async function syncMain(logger) {
     try {
       let chainType = 'MOVR';
       let nodeUrl = 'https://rpc.moonriver.moonbeam.network'
-      let sync_interval_block_num = 2;
+      let sync_interval_block_num = 1000;
   
       logger.info("********************************** syncChain begin **********************************", "chainType is", chainType);
       await syncChain(chainType, global.syncLogger, nodeUrl, sync_interval_block_num);
